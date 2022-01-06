@@ -28,5 +28,33 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
+  },
+
+  update: async (req, res) => {
+    const id = req.params.id;
+    const {email, company, first_name, last_name, url, text} = req.body;
+
+    try {
+      const result = await User.findByIdAndUpdate(id, {
+        email,
+        company,
+        first_name,
+        last_name,
+        url,
+        text
+      });
+      console.log(result);
+      if (result) {
+        res
+          .status(statusCode.RESPONSE_OK)
+          .json({message: responseMessage.RESPONSE_OK_UPDATED});
+      } else {
+        res
+          .status(statusCode.BAD_REQUEST_ERROR)
+          .json({message: responseMessage.BAD_REQUEST_ERROR});
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 };

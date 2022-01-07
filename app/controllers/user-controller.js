@@ -5,10 +5,12 @@ require('../config/config');
 
 module.exports = {
   createUser: async (req, res) => {
+    const id = req.params.id;
     const {email, first_name, last_name, company, url, text} = req.body;
 
     try {
       const userCreated = await new User({
+        id,
         email,
         first_name,
         last_name,
@@ -89,15 +91,12 @@ module.exports = {
 
       await Promise.all(
         arrayIds.map(async (id) => {
-          const userFounded = await User.findById(id);
+          const userFounded = await User.findOne({id},{_id:0});
           if (userFounded) result.push(userFounded);
         })
       );
-      console.log(result);
       if (result.length > 0) {
-        res
-          .status(statusCode.RESPONSE_OK)
-          .json({message: responseMessage.RESPONSE_OK, data: result});
+        res.status(statusCode.RESPONSE_OK).json({data: result});
       } else {
         res
           .status(statusCode.BAD_REQUEST_ERROR)

@@ -10,7 +10,7 @@ const {
 } = require('../controllers/user-controller');
 
 router
-  .post('/', createUser)
+  .post('/:id', createUser)
   .put('/:id', update)
   .delete('/:id', remove)
   .get('/:ids', getUsersById);

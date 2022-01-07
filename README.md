@@ -65,9 +65,7 @@ Pruebas unitarias son indispensables.
 Debe tener sus respectivas variables de entorno en diferentes archivo de con guracion
 ( production y development ).
 Use buenas prácticas de programación tenga en cuenta los conceptos de SOLID, KISS y DRY.
-Debes subir un repositorio privado en Github describiendo en el README.md la información
-del proyecto, instrucciones de setup y pruebas. Si el repositorio es público no se evaluará
-la prueba.
+
 -Puntos a evaluar
 Uso de las caracteristicas nuevas que se han ido agregando al lenguaje (ES2016 a ES2020).
 Organización, diseño y estructuración del proyecto.

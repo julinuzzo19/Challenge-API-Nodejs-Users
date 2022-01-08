@@ -14,9 +14,9 @@ const userSchema = new Schema(
     },
     first_name: {type: String, required: true},
     last_name: {type: String, required: true},
-    company: {type: String, required: true},
-    url: {type: String, required: true},
-    text: {type: String, required: true}
+    company: {type: String},
+    url: {type: String},
+    text: {type: String}
   },
   {
     versionKey: false

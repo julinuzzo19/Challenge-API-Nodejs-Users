@@ -1,6 +1,7 @@
 const statusCode = require('../constants/constants');
 const responseMessage = require('../constants/messages');
 const User = require('../models/user');
+const getUsersApi = require('../services/getUsersNotFounded');
 require('../config/config');
 
 module.exports = {
@@ -19,12 +20,17 @@ module.exports = {
         text
       }).save();
 
+      const {_id, ...result} = userCreated._doc;
+
       if (userCreated) {
         res.status(statusCode.RESPONSE_OK_CREATED).json({
           message: responseMessage.RESPONSE_OK_CREATED,
-          data: userCreated
+          data: result
         });
       } else {
+        res
+          .status(statusCode.BAD_REQUEST_ERROR)
+          .json({message: responseMessage.BAD_REQUEST_ERROR});
       }
     } catch (error) {
       res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);
@@ -37,15 +43,17 @@ module.exports = {
     const {email, company, first_name, last_name, url, text} = req.body;
 
     try {
-      const result = await User.findByIdAndUpdate(id, {
-        email,
-        company,
-        first_name,
-        last_name,
-        url,
-        text
-      });
-      console.log(result);
+      const result = await User.findOneAndUpdate(
+        {id},
+        {
+          email,
+          company,
+          first_name,
+          last_name,
+          url,
+          text
+        }
+      );
       if (result) {
         res
           .status(statusCode.RESPONSE_OK)
@@ -65,8 +73,7 @@ module.exports = {
     const id = req.params.id;
 
     try {
-      const result = await User.findOneAndDelete({_id: id});
-      console.log(result);
+      const result = await User.findOneAndDelete({id});
 
       if (result) {
         res
@@ -88,19 +95,26 @@ module.exports = {
       const arrayIds = ids.split(',');
 
       const result = [];
+      const notFoundIds = [];
 
       await Promise.all(
         arrayIds.map(async (id) => {
-          const userFounded = await User.findOne({id},{_id:0});
+          const userFounded = await User.findOne({id}, {_id: 0});
           if (userFounded) result.push(userFounded);
+          else {
+            notFoundIds.push(id);
+          }
         })
       );
+
+      await getUsersApi(notFoundIds);
+
       if (result.length > 0) {
         res.status(statusCode.RESPONSE_OK).json({data: result});
       } else {
         res
-          .status(statusCode.BAD_REQUEST_ERROR)
-          .json({message: responseMessage.BAD_REQUEST_ERROR});
+          .status(statusCode.NOT_FOUND_ERROR)
+          .json({message: responseMessage.NOT_FOUND_ERROR});
       }
     } catch (error) {
       res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);

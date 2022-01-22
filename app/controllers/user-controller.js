@@ -120,5 +120,10 @@ module.exports = {
       res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);
       console.log(error);
     }
+  },
+  getAll: async (req, res) => {
+    const response = await User.find({});
+
+    res.json({data: response});
   }
 };

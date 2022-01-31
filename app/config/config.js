@@ -1,15 +1,18 @@
 const mongoose = require('mongoose');
 const db = mongoose.connection;
 
-let uri = 'mongodb://root:admin@127.0.0.1:27018/db_api?authSource=admin';
+const {MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOSTNAME, MONGO_PORT, MONGO_DB} =
+  process.env;
+
+let uri = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOSTNAME}:${MONGO_PORT}/${MONGO_DB}?authSource=admin`;
 
 mongoose.connect(uri);
 
-db.once('open', (_) => {
+db.once('open', _ => {
   console.log('Database is connected to:', uri);
 });
 
 // to test the error stop mongod
-db.on('error', (err) => {
+db.on('error', err => {
   console.log(err);
 });

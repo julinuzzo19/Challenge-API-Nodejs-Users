@@ -4,11 +4,11 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const app = express();
 const cors = require('cors');
+require('dotenv').config()
 
 require('./app/config/config');
 
 const indexRouter = require('./app/routes/index');
-
 
 app.use(cors());
 app.use(logger('dev'));

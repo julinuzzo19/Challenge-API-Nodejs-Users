@@ -1,31 +1,30 @@
 version: '3.8'
 
 services:
-  mongo_db:
-    container_name: mongo_db
+  mongo:
+    container_name: mongo
     image: mongo:4.4.12-rc0
     environment:
       - MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME
       - MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD
     volumes:
-      - mongo-data:/etc/mongodb/
+      - mongo_api-data:/etc/mongodb/
     ports:
       - 27018:27017
 
   api_node:
-    env_file: ./.env
     container_name: api_node
-    image: node_api_users:latest
+    image: api_node:latest
     depends_on:
-      - mongo_db
+      - mongo
     environment:
       - MONGO_USERNAME=$MONGO_USERNAME
       - MONGO_PASSWORD=$MONGO_PASSWORD
-      - MONGO_HOSTNAME=mongo_db
+      - MONGO_HOSTNAME=mongo
       - MONGO_PORT=27017
       - MONGO_DB=$MONGO_DB
       - PORT=$PORT
     ports:
       - 3000:3000
 volumes:
-  mongo-data:
+  mongo_api-data:

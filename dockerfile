@@ -1,6 +1,6 @@
 FROM node:stretch
 
-WORKDIR /Challenge-API-Nodejs-Users
+WORKDIR /api-node-challenge
 
 COPY package*.json ./
 

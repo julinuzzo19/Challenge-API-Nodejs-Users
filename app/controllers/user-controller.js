@@ -98,7 +98,7 @@ module.exports = {
       const notFoundIds = [];
 
       await Promise.all(
-        arrayIds.map(async (id) => {
+        arrayIds.map(async id => {
           const userFounded = await User.findOne({id}, {_id: 0});
           if (userFounded) result.push(userFounded);
           else {

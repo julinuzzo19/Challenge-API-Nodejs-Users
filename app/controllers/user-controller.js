@@ -2,9 +2,41 @@ const statusCode = require('../constants/constants');
 const responseMessage = require('../constants/messages');
 const User = require('../models/user');
 const getUsersApi = require('../services/getUsersNotFounded');
+const {uploadImage} = require('../services/uploadImageS3');
 require('../config/config');
 
 module.exports = {
+  uploadImageUser: async (req, res) => {
+    try {
+      const {path, mimetype} = req.file;
+      const {id} = req.params;
+
+      const image = await uploadImage({path, id, mimetype});
+      if (image) {
+        const result = await User.findOneAndUpdate({id}, {image});
+
+        if (result) {
+          res.status(statusCode.RESPONSE_OK_CREATED).json({
+            message: responseMessage.RESPONSE_OK_CREATED,
+            result
+          });
+        } else {
+          res
+            .status(statusCode.BAD_REQUEST_ERROR)
+            .json({message: responseMessage.BAD_REQUEST_ERROR});
+        }
+      } else {
+        res.status(statusCode.BAD_REQUEST_ERROR).json({
+          message: responseMessage.INTERNAL_ERROR,
+          error
+        });
+      }
+    } catch (error) {
+      res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);
+      console.log(error);
+    }
+  },
+
   createUser: async (req, res) => {
     const id = req.params.id;
     const {email, first_name, last_name, company, url, text} = req.body;

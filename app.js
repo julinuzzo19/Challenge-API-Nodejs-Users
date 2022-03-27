@@ -4,7 +4,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const app = express();
 const cors = require('cors');
-require('dotenv').config()
+require('dotenv').config();
 
 require('./app/config/config');
 
@@ -13,7 +13,7 @@ const indexRouter = require('./app/routes/index');
 app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 

@@ -2,7 +2,7 @@ const statusCode = require('../constants/constants');
 const responseMessage = require('../constants/messages');
 const User = require('../models/user');
 const getUsersApi = require('../services/getUsersNotFounded');
-const {uploadImage} = require('../services/uploadImageS3');
+const userService = require('../services/user-service');
 require('../config/config');
 
 module.exports = {
@@ -11,20 +11,13 @@ module.exports = {
       const {path, mimetype} = req.file;
       const {id} = req.params;
 
-      const image = await uploadImage({path, id, mimetype});
-      if (image) {
-        const result = await User.findOneAndUpdate({id}, {image});
+      const result = userService.uploadImage({path, mimetype, id});
 
-        if (result) {
-          res.status(statusCode.RESPONSE_OK_CREATED).json({
-            message: responseMessage.RESPONSE_OK_CREATED,
-            result
-          });
-        } else {
-          res
-            .status(statusCode.BAD_REQUEST_ERROR)
-            .json({message: responseMessage.BAD_REQUEST_ERROR});
-        }
+      if (result) {
+        res.status(statusCode.RESPONSE_OK_CREATED).json({
+          message: responseMessage.RESPONSE_OK_CREATED,
+          result
+        });
       } else {
         res.status(statusCode.BAD_REQUEST_ERROR).json({
           message: responseMessage.INTERNAL_ERROR,
@@ -39,22 +32,14 @@ module.exports = {
 
   createUser: async (req, res) => {
     const id = req.params.id;
-    const {email, first_name, last_name, company, url, text} = req.body;
+    const data = req.body;
+    data.id = id;
 
     try {
-      const userCreated = await new User({
-        id,
-        email,
-        first_name,
-        last_name,
-        company,
-        url,
-        text
-      }).save();
-
-      const {_id, ...result} = userCreated._doc;
+      const userCreated = await userService.createUser(data);
 
       if (userCreated) {
+        const {_id, ...result} = userCreated._doc;
         res.status(statusCode.RESPONSE_OK_CREATED).json({
           message: responseMessage.RESPONSE_OK_CREATED,
           data: result
@@ -72,20 +57,10 @@ module.exports = {
 
   update: async (req, res) => {
     const id = req.params.id;
-    const {email, company, first_name, last_name, url, text} = req.body;
+    const data = req.body;
 
     try {
-      const result = await User.findOneAndUpdate(
-        {id},
-        {
-          email,
-          company,
-          first_name,
-          last_name,
-          url,
-          text
-        }
-      );
+      const result = userService.updateUser(id, {data});
       if (result) {
         res
           .status(statusCode.RESPONSE_OK)
@@ -105,7 +80,7 @@ module.exports = {
     const id = req.params.id;
 
     try {
-      const result = await User.findOneAndDelete({id});
+      const result = userService.removeUser(id);
 
       if (result) {
         res
@@ -132,6 +107,7 @@ module.exports = {
       await Promise.all(
         arrayIds.map(async id => {
           const userFounded = await User.findOne({id}, {_id: 0});
+          console.log(userFounded);
           if (userFounded) result.push(userFounded);
           else {
             notFoundIds.push(id);
@@ -154,8 +130,13 @@ module.exports = {
     }
   },
   getAll: async (req, res) => {
-    const response = await User.find({});
+    try {
+      const result = userService.getAllUsers();
 
-    res.json({data: response});
+      res.json({data: result});
+    } catch (error) {
+      res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);
+      console.log(error);
+    }
   }
 };

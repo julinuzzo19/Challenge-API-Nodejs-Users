@@ -10,6 +10,7 @@ module.exports = getUsersApi = async (ids) => {
     result.map((res) => {
       if (res.status === 'fulfilled') {
         const {id, email, first_name, last_name} = res.value.data.data;
+        console.log({id, email, first_name, last_name})
 
         new User({
           id,

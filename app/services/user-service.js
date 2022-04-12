@@ -16,7 +16,10 @@ module.exports = {
       const deleted = await userRepository.remove(result.id);
       console.log({deleted});
       if (deleted) {
-        await removeImage({key: result.image.key});
+        if (result.image?.key) {
+          await removeImage({key: result.image.key});
+          return true;
+        }
         return true;
       }
     }
@@ -28,5 +31,24 @@ module.exports = {
   },
   createUser: async data => {
     return userRepository.createUser(data);
+  },
+  getUser: async arrayIds => {
+    const result = [];
+    const notFoundIds = [];
+
+    await Promise.all(
+      arrayIds.map(async id => {
+        const userFounded = await userRepository.getUserById(id);
+        console.log(userFounded);
+        if (userFounded) result.push(userFounded);
+        else {
+          notFoundIds.push(id);
+        }
+      })
+    );
+
+    await getUsersApi(notFoundIds);
+
+    return result;
   }
 };

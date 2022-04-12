@@ -1,7 +1,6 @@
 const statusCode = require('../constants/constants');
 const responseMessage = require('../constants/messages');
 const User = require('../models/user');
-const getUsersApi = require('../services/getUsersNotFounded');
 const userService = require('../services/user-service');
 require('../config/config');
 
@@ -111,21 +110,7 @@ module.exports = {
     try {
       const arrayIds = ids.split(',');
 
-      const result = [];
-      const notFoundIds = [];
-
-      await Promise.all(
-        arrayIds.map(async id => {
-          const userFounded = await User.findOne({id}, {_id: 0});
-          console.log(userFounded);
-          if (userFounded) result.push(userFounded);
-          else {
-            notFoundIds.push(id);
-          }
-        })
-      );
-
-      await getUsersApi(notFoundIds);
+      const result = await userService.getUser(arrayIds);
 
       if (result.length > 0) {
         res.status(statusCode.RESPONSE_OK).json({data: result});

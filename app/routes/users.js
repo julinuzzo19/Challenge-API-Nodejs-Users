@@ -14,7 +14,7 @@ const {
 router
   .post(
     '/:id',
-    fileUpload({useTempFiles: true, tempFileDir: '../../uploads'}),
+    fileUpload({useTempFiles: true, tempFileDir: './uploads'}),
     createUser
   )
   .put('/:id', update)

@@ -16,5 +16,12 @@ module.exports = {
       ContentType: mimetype
     };
     return S3.upload(params).promise();
+  },
+  remove: ({key}) => {
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: key
+    };
+    return S3.deleteObject(params).promise();
   }
 };

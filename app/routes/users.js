@@ -1,6 +1,6 @@
 const express = require('express');
-const multer = require('multer');
-const upload = multer({dest: 'uploads/'});
+const fileUpload = require('express-fileupload');
+
 const router = express.Router();
 
 const {
@@ -8,16 +8,18 @@ const {
   update,
   remove,
   getUsersById,
-  getAll,
-  uploadImageUser
+  getAll
 } = require('../controllers/user-controller');
 
 router
-  .post('/:id', createUser)
+  .post(
+    '/:id',
+    fileUpload({useTempFiles: true, tempFileDir: '../../uploads'}),
+    createUser
+  )
   .put('/:id', update)
   .delete('/:id', remove)
   .get('/:ids', getUsersById)
-  .get('/', getAll)
-  .post('/image/:id', upload.single('image'), uploadImageUser);
+  .get('/', getAll);
 
 module.exports = router;

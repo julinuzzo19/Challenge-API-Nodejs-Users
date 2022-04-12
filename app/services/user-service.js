@@ -1,24 +1,26 @@
 const getUsersApi = require('../services/getUsersNotFounded');
-const {uploadImage} = require('../services/uploadImageS3');
+const {uploadImage, removeImage} = require('../services/uploadImageS3');
 const userRepository = require('../repositories/user-repository');
 
 module.exports = {
   uploadImage: async ({path, mimetype, id}) => {
-    const user = await userRepository.getUserById(id);
-
-    if (user) {
-      const image = await uploadImage({path, id, mimetype});
-
-      return userRepository.updateUser(id, {data: {image}});
-    }
-    return null;
+    return uploadImage({path, mimetype, id});
   },
 
   getAllUsers: async () => {
     return userRepository.getAll();
   },
-  removeUser: id => {
-    return userRepository.remove(id);
+  removeUser: async id => {
+    const result = await userRepository.getUserById(id);
+    if (result) {
+      const deleted = await userRepository.remove(result.id);
+      console.log({deleted});
+      if (deleted) {
+        await removeImage({key: result.image.key});
+        return true;
+      }
+    }
+    return null;
   },
 
   updateUser: async (id, data) => {

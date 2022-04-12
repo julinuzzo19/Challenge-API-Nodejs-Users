@@ -8,7 +8,7 @@ require('../config/config');
 module.exports = {
   uploadImageUser: async (req, res) => {
     try {
-      const {path, mimetype} = req.file;
+      const {path, mimetype} = req.files;
       const {id} = req.params;
 
       const result = userService.uploadImage({path, mimetype, id});
@@ -33,9 +33,19 @@ module.exports = {
   createUser: async (req, res) => {
     const id = req.params.id;
     const data = req.body;
+    const {tempFilePath, mimetype} = req.files?.image;
     data.id = id;
 
+    console.log({tempFilePath, mimetype});
     try {
+      const {Location, key} = await userService.uploadImage({
+        path: tempFilePath,
+        mimetype,
+        id
+      });
+      console.log({Location, key});
+
+      data.image = {url: Location, key};
       const userCreated = await userService.createUser(data);
 
       if (userCreated) {
@@ -80,7 +90,7 @@ module.exports = {
     const id = req.params.id;
 
     try {
-      const result = userService.removeUser(id);
+      const result = await userService.removeUser(id);
 
       if (result) {
         res
@@ -131,7 +141,7 @@ module.exports = {
   },
   getAll: async (req, res) => {
     try {
-      const result = userService.getAllUsers();
+      const result = await userService.getAllUsers();
 
       res.json({data: result});
     } catch (error) {

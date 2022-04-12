@@ -17,7 +17,10 @@ const userSchema = new Schema(
     company: {type: String},
     url: {type: String},
     text: {type: String},
-    image: {type: String}
+    image: {
+      url: {type: String},
+      key: {type: String}
+    }
   },
   {
     versionKey: false

@@ -1,4 +1,4 @@
-const {Schema, model} = require('mongoose');
+const { Schema, model } = require("mongoose");
 
 const userSchema = new Schema(
   {
@@ -6,25 +6,25 @@ const userSchema = new Schema(
       type: Number,
       unique: true,
       required: true,
-      index: true
+      index: true,
     },
     email: {
       type: String,
-      required: true
+      required: true,
     },
-    first_name: {type: String, required: true},
-    last_name: {type: String, required: true},
-    company: {type: String},
-    url: {type: String},
-    text: {type: String},
+    first_name: { type: String, required: true },
+    last_name: { type: String, required: true },
+    company: { type: String },
+    url: { type: String },
+    text: { type: String },
     image: {
-      url: {type: String},
-      key: {type: String}
-    }
+      url: { type: String },
+      key: { type: String },
+    },
   },
   {
-    versionKey: false
+    versionKey: false,
   }
 );
 
-module.exports = new model('User', userSchema);
+module.exports = new model("User", userSchema);

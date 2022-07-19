@@ -1,65 +1,70 @@
-const statusCode = require('../constants/constants');
-const responseMessage = require('../constants/messages');
-const User = require('../models/user');
-const userService = require('../services/user-service');
-require('../config/config');
+const statusCode = require("../constants/constants");
+const responseMessage = require("../constants/messages");
+const User = require("../models/user");
+const userService = require("../services/user-service");
+require("../config/config");
 
 module.exports = {
   uploadImageUser: async (req, res) => {
     try {
-      const {path, mimetype} = req.files;
-      const {id} = req.params;
+      const { path, mimetype } = req.files;
+      const { id } = req.params;
 
-      const result = userService.uploadImage({path, mimetype, id});
+      const result = userService.uploadImage({ path, mimetype, id });
 
       if (result) {
         res.status(statusCode.RESPONSE_OK_CREATED).json({
           message: responseMessage.RESPONSE_OK_CREATED,
-          result
+          result,
         });
       } else {
         res.status(statusCode.BAD_REQUEST_ERROR).json({
           message: responseMessage.INTERNAL_ERROR,
-          error
+          error,
         });
       }
     } catch (error) {
-      res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);
+      res
+        .status(statusCode.INTERNAL_ERROR)
+        .json(responseMessage.INTERNAL_ERROR);
       console.log(error);
     }
   },
 
   createUser: async (req, res) => {
-    const id = req.params.id;
-    const data = req.body;
-    const {tempFilePath, mimetype} = req.files?.image;
-    data.id = id;
-
-    console.log({tempFilePath, mimetype});
     try {
-      const {Location, key} = await userService.uploadImage({
+      const id = req.params.id;
+      const data = req.body;
+      const { tempFilePath, mimetype } = req.files?.image;
+      data.id = id;
+
+      console.log({ tempFilePath, mimetype });
+
+      const { Location, key } = await userService.uploadImage({
         path: tempFilePath,
         mimetype,
-        id
+        id,
       });
-      console.log({Location, key});
+      console.log({ Location, key });
 
-      data.image = {url: Location, key};
+      data.image = { url: Location, key };
       const userCreated = await userService.createUser(data);
 
       if (userCreated) {
-        const {_id, ...result} = userCreated._doc;
+        const { _id, ...result } = userCreated._doc;
         res.status(statusCode.RESPONSE_OK_CREATED).json({
           message: responseMessage.RESPONSE_OK_CREATED,
-          data: result
+          data: result,
         });
       } else {
         res
           .status(statusCode.BAD_REQUEST_ERROR)
-          .json({message: responseMessage.BAD_REQUEST_ERROR});
+          .json({ message: responseMessage.BAD_REQUEST_ERROR });
       }
     } catch (error) {
-      res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);
+      res
+        .status(statusCode.INTERNAL_ERROR)
+        .json(responseMessage.INTERNAL_ERROR);
       console.log(error);
     }
   },
@@ -67,20 +72,22 @@ module.exports = {
   update: async (req, res) => {
     const id = req.params.id;
     const data = req.body;
-
+    console.log(data);
     try {
-      const result = userService.updateUser(id, {data});
+      const result = userService.updateUser(id, { data });
       if (result) {
         res
           .status(statusCode.RESPONSE_OK)
-          .json({message: responseMessage.RESPONSE_OK_UPDATED});
+          .json({ message: responseMessage.RESPONSE_OK_UPDATED });
       } else {
         res
           .status(statusCode.BAD_REQUEST_ERROR)
-          .json({message: responseMessage.BAD_REQUEST_ERROR});
+          .json({ message: responseMessage.BAD_REQUEST_ERROR });
       }
     } catch (error) {
-      res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);
+      res
+        .status(statusCode.INTERNAL_ERROR)
+        .json(responseMessage.INTERNAL_ERROR);
       console.log(error);
     }
   },
@@ -94,33 +101,37 @@ module.exports = {
       if (result) {
         res
           .status(statusCode.RESPONSE_OK)
-          .json({message: responseMessage.RESPONSE_OK_DELETED});
+          .json({ message: responseMessage.RESPONSE_OK_DELETED });
       } else {
         res
           .status(statusCode.BAD_REQUEST_ERROR)
-          .json({message: responseMessage.BAD_REQUEST_ERROR});
+          .json({ message: responseMessage.BAD_REQUEST_ERROR });
       }
     } catch (error) {
-      res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);
+      res
+        .status(statusCode.INTERNAL_ERROR)
+        .json(responseMessage.INTERNAL_ERROR);
       console.log(error);
     }
   },
   getUsersById: async (req, res) => {
     const ids = req.params.ids;
     try {
-      const arrayIds = ids.split(',');
+      const arrayIds = ids.split(",");
 
       const result = await userService.getUser(arrayIds);
 
       if (result.length > 0) {
-        res.status(statusCode.RESPONSE_OK).json({data: result});
+        res.status(statusCode.RESPONSE_OK).json({ data: result });
       } else {
         res
           .status(statusCode.NOT_FOUND_ERROR)
-          .json({message: responseMessage.NOT_FOUND_ERROR});
+          .json({ message: responseMessage.NOT_FOUND_ERROR });
       }
     } catch (error) {
-      res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);
+      res
+        .status(statusCode.INTERNAL_ERROR)
+        .json(responseMessage.INTERNAL_ERROR);
       console.log(error);
     }
   },
@@ -128,10 +139,12 @@ module.exports = {
     try {
       const result = await userService.getAllUsers();
 
-      res.json({data: result});
+      res.json({ data: result });
     } catch (error) {
-      res.status(statusCode.INTERNAL_ERROR).json(responseMessage.INTERNAL_ERROR);
+      res
+        .status(statusCode.INTERNAL_ERROR)
+        .json(responseMessage.INTERNAL_ERROR);
       console.log(error);
     }
-  }
+  },
 };

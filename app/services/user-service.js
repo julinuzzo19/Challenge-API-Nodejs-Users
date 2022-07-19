@@ -14,7 +14,7 @@ module.exports = {
     const result = await userRepository.getUserById(id);
     if (result) {
       const deleted = await userRepository.remove(result.id);
-      console.log({deleted});
+
       if (deleted) {
         if (result.image?.key) {
           await removeImage({key: result.image.key});
